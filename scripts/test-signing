@@ -1,0 +1,35 @@
+#!/bin/sh
+# SPDX-License-Identifier: Apache-2.0
+
+set -eu
+root=$(cd "$(dirname "$0")/.." && pwd)
+project="zkeyring-signing-$(openssl rand -hex 5)"
+# Assign before exporting, so that set -e stops on a failed openssl.
+ZKEYRING_TEST_VAULT_TOKEN=$(openssl rand -hex 16)
+ZKEYRING_TEST_BAO_TOKEN=$(openssl rand -hex 16)
+ZKEYRING_TEST_DB_PASSWORD=$(openssl rand -hex 16)
+ZKEYRING_TEST_AUTH_SECRET=$(openssl rand -hex 32)
+ZKEYRING_TEST_ENCRYPTION_KEY=$(openssl rand -hex 16)
+ZKEYRING_TEST_INFISICAL_URL=
+export ZKEYRING_TEST_VAULT_TOKEN ZKEYRING_TEST_BAO_TOKEN ZKEYRING_TEST_DB_PASSWORD \
+    ZKEYRING_TEST_AUTH_SECRET ZKEYRING_TEST_ENCRYPTION_KEY ZKEYRING_TEST_INFISICAL_URL
+
+compose() {
+    docker compose -p "$project" -f "$root/tests/signing/compose.yaml" "$@"
+}
+
+trap 'compose down --volumes' EXIT
+case "${1:-}" in
+    "")
+        compose up -d --wait vault openbao
+        ;;
+    --infisical)
+        export ZKEYRING_TEST_INFISICAL_URL=http://127.0.0.1:8080
+        compose up -d --wait infisical openbao
+        ;;
+    *)
+        printf 'Usage: %s [--infisical]\n' "$0" >&2
+        exit 2
+        ;;
+esac
+compose run --rm --no-deps --build -T tests

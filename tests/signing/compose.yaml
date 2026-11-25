@@ -1,0 +1,80 @@
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  vault:
+    image: hashicorp/vault:1.20.4@sha256:268bb80aa9c6d13d65fcfa05c0c268caca068952240a8087291a6ce0b66e3a10
+    command: ["server", "-dev", "-dev-listen-address=0.0.0.0:8200"]
+    environment:
+      VAULT_DEV_ROOT_TOKEN_ID: ${ZKEYRING_TEST_VAULT_TOKEN:?}
+    ports:
+      - "127.0.0.1::8200"
+      - "127.0.0.1::8080"
+    healthcheck:
+      test: ["CMD", "vault", "status", "-address=http://127.0.0.1:8200"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+
+  openbao:
+    image: openbao/openbao:2.5.0@sha256:d24890f589bc57658a43c18faab2afc4fbedaadad3806d5a638e1adaed2dff8d
+    network_mode: service:vault
+    command: ["server", "-dev", "-dev-listen-address=127.0.0.1:8300"]
+    environment:
+      BAO_DEV_ROOT_TOKEN_ID: ${ZKEYRING_TEST_BAO_TOKEN:?}
+    depends_on:
+      vault:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "bao", "status", "-address=http://127.0.0.1:8300"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+
+  postgres:
+    image: postgres:16.11-alpine@sha256:4327b9fd295502f326f44153a1045a7170ddbfffed1c3829798328556cfd09e2
+    environment:
+      POSTGRES_DB: infisical
+      POSTGRES_USER: infisical
+      POSTGRES_PASSWORD: ${ZKEYRING_TEST_DB_PASSWORD:?}
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "infisical"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+
+  redis:
+    image: redis:7.4.7-alpine@sha256:02f2cc4882f8bf87c79a220ac958f58c700bdec0dfb9b9ea61b62fb0e8f1bfcf
+
+  infisical:
+    image: infisical/infisical:v0.167.15@sha256:dcf4e51364c03f2263769a45cb03be42c7caf9caa3dc18d4eeba344faeed8a1e
+    network_mode: service:vault
+    environment:
+      AUTH_SECRET: ${ZKEYRING_TEST_AUTH_SECRET:?}
+      ENCRYPTION_KEY: ${ZKEYRING_TEST_ENCRYPTION_KEY:?}
+      DB_CONNECTION_URI: postgresql://infisical:${ZKEYRING_TEST_DB_PASSWORD:?}@postgres:5432/infisical
+      REDIS_URL: redis://redis:6379
+      SITE_URL: http://127.0.0.1:8080
+      TELEMETRY_ENABLED: "false"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      vault:
+        condition: service_started
+
+  tests:
+    build:
+      context: .
+      args:
+        ZKEYRING_ZEPHYR_IMAGE: ${ZKEYRING_ZEPHYR_IMAGE:-ghcr.io/zephyrproject-rtos/ci@sha256:5ace764c6b5dbc2da2b7a89f6bd67ae0933106376ee66df41ec635066d269d8c}
+    network_mode: service:vault
+    environment:
+      ZKEYRING_TEST_VAULT_URL: http://127.0.0.1:8200
+      ZKEYRING_TEST_VAULT_TOKEN: ${ZKEYRING_TEST_VAULT_TOKEN:?}
+      ZKEYRING_TEST_BAO_URL: http://127.0.0.1:8300
+      ZKEYRING_TEST_BAO_TOKEN: ${ZKEYRING_TEST_BAO_TOKEN:?}
+      ZKEYRING_TEST_INFISICAL_URL: ${ZKEYRING_TEST_INFISICAL_URL:-}
+    volumes:
+      - ../..:/source:ro
+    command: ["sh", "/source/tests/signing/run-in-docker.sh"]

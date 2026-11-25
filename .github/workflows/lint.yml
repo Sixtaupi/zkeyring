@@ -1,0 +1,76 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 Romain Pelletant
+
+name: Lint
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  python:
+    name: Python (ruff)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.12"
+
+      # Use the ruff rules of the Zephyr revision that west-dev.yml selects.
+      - name: Get the Zephyr ruff configuration
+        shell: bash
+        run: |
+          revision=$(yq -e '.manifest.projects[] | select(.name == "zephyr") | .revision' west-dev.yml)
+          mkdir -p "$RUNNER_TEMP/zephyr"
+          for file in .ruff.toml .ruff-excludes.toml; do
+            curl -fsSL --retry 3 -o "$RUNNER_TEMP/zephyr/$file" \
+              "https://raw.githubusercontent.com/zephyrproject-rtos/zephyr/$revision/$file"
+          done
+
+      # Same ruff version as Zephyr's scripts/requirements-compliance.txt.
+      - name: Check the Python files
+        run: |
+          python -m pip install ruff==0.14.2
+          paths=(scripts/signing scripts/west_zkeyring.py samples/signed_firmware tests/signing)
+          ruff --config "$RUNNER_TEMP/zephyr/.ruff.toml" check "${paths[@]}"
+          ruff --config "$RUNNER_TEMP/zephyr/.ruff.toml" format --check --diff "${paths[@]}"
+
+  shell:
+    name: Shell (shellcheck)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # Check every tracked file that is a shell script, with or without .sh.
+      - name: Check the shell scripts
+        shell: bash
+        run: |
+          shellcheck --version
+          scripts=()
+          # -I skips binary files; the shebang must be on the first line.
+          while IFS= read -r -d '' file; do
+            if [[ $file == *.sh ]] || head -n 1 "$file" | grep -qE '^#!.*[/ ](ba|da)?sh( |$)'; then
+              scripts+=("$file")
+            fi
+          done < <(git grep -zlI -e '' -- .)
+          printf '%s\n' "${scripts[@]}"
+          shellcheck "${scripts[@]}"

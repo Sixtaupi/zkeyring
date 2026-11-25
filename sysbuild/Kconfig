@@ -1,0 +1,35 @@
+# SPDX-License-Identifier: Apache-2.0
+
+choice ZKEYRING_SIGNATURE_TYPE
+	prompt "Firmware signature algorithm"
+	depends on BOOTLOADER_MCUBOOT
+	default ZKEYRING_SIGNATURE_INHERIT
+	help
+	  Set the signature algorithm that MCUboot verifies. The public key in
+	  the selected zkeyring profile must match this algorithm.
+
+config ZKEYRING_SIGNATURE_INHERIT
+	bool "Use the MCUboot Sysbuild setting"
+
+config ZKEYRING_SIGNATURE_ECDSA_P256
+	bool "ECDSA P-256"
+
+config ZKEYRING_SIGNATURE_RSA_2048
+	bool "RSA-PSS 2048"
+
+config ZKEYRING_SIGNATURE_RSA_3072
+	bool "RSA-PSS 3072"
+
+config ZKEYRING_SIGNATURE_ED25519
+	bool "Ed25519"
+
+endchoice
+
+config ZKEYRING_PROFILE_PUBLIC_KEY
+	bool "Use the zkeyring profile's public key in MCUboot"
+	depends on BOOTLOADER_MCUBOOT && (!BOOT_SIGNATURE_TYPE_NONE || !ZKEYRING_SIGNATURE_INHERIT)
+	help
+	  Let the main application provide MCUboot's primary verification key.
+	  Select a zkeyring profile with CONFIG_ZSIGNING_PROFILE and set its
+	  public_key and fingerprint fields. A profile without public_key
+	  uses the configured MCUboot signing public key.

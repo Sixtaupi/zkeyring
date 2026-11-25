@@ -1,0 +1,21 @@
+<div class="zk-diagram">
+<svg viewBox="0 0 800 270" role="img" aria-labelledby="cust-title cust-desc" xmlns="http://www.w3.org/2000/svg">
+<title id="cust-title">Where the private key is used</title>
+<desc id="cust-desc">With in-process backends the private key is loaded into the zkeyring process. With remote backends only the digest leaves the process and the private key stays in the service or token.</desc>
+<defs><marker id="cust-a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="8" markerHeight="8" orient="auto"><path class="head" d="M0 0L8 4L0 8z"/></marker></defs>
+<text class="title" x="10" y="24">In-process signing</text>
+<rect class="box" x="10" y="40" width="150" height="90" rx="8"/><text x="26" y="72">Secret store</text><text class="small" x="26" y="96">stores the PEM</text>
+<path class="line" d="M160 85H226" marker-end="url(#cust-a)"/><text class="small" x="176" y="76">PEM</text>
+<rect class="box key" x="228" y="40" width="152" height="90" rx="8"/><text x="244" y="72">zkeyring</text><text class="small" x="244" y="96">key in memory,</text><text class="small" x="244" y="114">signs the digest</text>
+<text class="small" x="10" y="164">local-keyring, sops, environment,</text><text class="small" x="10" y="182">gitlab-secrets, vault-kv</text>
+<text x="10" y="216">Whoever runs the signing step</text><text x="10" y="238">can read the key.</text>
+<path class="line" d="M400 20V250" stroke-dasharray="4 5"/>
+<text class="title" x="420" y="24">Remote signing</text>
+<rect class="box" x="420" y="40" width="150" height="90" rx="8"/><text x="436" y="72">zkeyring</text><text class="small" x="436" y="96">never sees the key</text>
+<path class="line" d="M570 72H636" marker-end="url(#cust-a)"/><text class="small" x="582" y="62">digest</text>
+<path class="line" d="M638 106H572" marker-end="url(#cust-a)"/><text class="small" x="578" y="124">signature</text>
+<rect class="box key" x="638" y="40" width="152" height="90" rx="8"/><text x="654" y="72">KMS or HSM</text><text class="small" x="654" y="96">non-exportable key,</text><text class="small" x="654" y="114">signs the digest</text>
+<text class="small" x="420" y="164">vault-transit, openbao, infisical,</text><text class="small" x="420" y="182">pkcs11</text>
+<text x="420" y="216">Whoever runs the signing step</text><text x="420" y="238">can request signatures only.</text>
+</svg>
+</div>

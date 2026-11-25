@@ -1,0 +1,11 @@
+# SPDX-License-Identifier: Apache-2.0
+
+build:
+  kconfig: Kconfig
+  cmake: .
+  sysbuild-cmake: sysbuild
+  sysbuild-kconfig: sysbuild/Kconfig
+package-managers:
+  pip:
+    requirement-files:
+      - scripts/requirements.txt

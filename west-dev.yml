@@ -1,0 +1,23 @@
+# SPDX-License-Identifier: Apache-2.0
+
+# Workspace to develop and test zkeyring.
+manifest:
+  self:
+    import: west.yml
+
+  remotes:
+    - name: zephyrproject-rtos
+      url-base: https://github.com/zephyrproject-rtos
+
+  projects:
+    - name: zephyr
+      remote: zephyrproject-rtos
+      revision: c3f7bba9ada59b13262369d36d74c039c369a237
+      import:
+        name-allowlist:
+          - cmsis_6
+          - hal_nordic
+          - hal_stm32
+          - mcuboot
+          - mbedtls
+          - tf-psa-crypto

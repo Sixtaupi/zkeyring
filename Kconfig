@@ -1,0 +1,33 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 Romain Pelletant
+
+config ZSIGNING
+	bool "Sign MCUboot firmware with zkeyring"
+	depends on BOOTLOADER_MCUBOOT
+	help
+	  Export the MCUboot image parameters and public key, then run
+	  zkeyring sign as part of the build.
+
+config ZSIGNING_DEFERRED
+	bool "Defer zkeyring signing to a separate step"
+	depends on ZSIGNING
+	help
+	  Export the unsigned image and signing metadata for a separate
+	  west zkeyring sign invocation in an environment with backend access.
+
+config ZSIGNING_PROFILE_FILE
+	string "zkeyring signing profile file"
+	depends on ZSIGNING
+	default "zkeyring.yaml"
+	help
+	  Path to the YAML profile file used during the build. Relative
+	  paths are resolved against the application source directory.
+	  The ZKEYRING_CONFIG CMake variable can override this path.
+
+config ZSIGNING_PROFILE
+	string "zkeyring signing profile"
+	depends on ZSIGNING
+	default "default"
+	help
+	  Name of the profile used for signing during the build. The
+	  ZKEYRING_PROFILE CMake variable can override this name.

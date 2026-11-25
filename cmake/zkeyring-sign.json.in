@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "image": "@KERNEL_NAME@.bin",
+  "version": "@CONFIG_MCUBOOT_IMGTOOL_SIGN_VERSION@",
+  "header_size": @header_size@,
+  "slot_size": @slot_size@,
+  "align": @align@,
+  "overwrite_only": @overwrite_only@
+}

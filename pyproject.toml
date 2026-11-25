@@ -1,0 +1,47 @@
+# SPDX-License-Identifier: Apache-2.0
+
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "zkeyring"
+version = "0.1.0"
+description = "External firmware signing for Zephyr and MCUboot"
+readme = "README.md"
+requires-python = ">=3.12"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+authors = [{ name = "Romain PELLETANT" }]
+keywords = ["firmware", "signing", "secure boot", "zephyr", "mcuboot"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Security :: Cryptography",
+    "Topic :: Software Development :: Embedded Systems",
+]
+dependencies = [
+    "cryptography>=40",
+    "keyring>=25",
+    "requests>=2.32",
+    "west>=1.2",
+    "PyYAML>=6.0",
+]
+
+[project.urls]
+Repository = "https://github.com/Sixtaupi/zkeyring"
+Documentation = "https://github.com/Sixtaupi/zkeyring#documentation"
+Issues = "https://github.com/Sixtaupi/zkeyring/issues"
+
+[project.optional-dependencies]
+pkcs11 = ["python-pkcs11>=0.9"]
+
+[project.scripts]
+zkeyring = "zkeyring.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "scripts/signing"}
+packages = ["zkeyring"]

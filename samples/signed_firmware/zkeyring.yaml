@@ -1,0 +1,82 @@
+# SPDX-License-Identifier: Apache-2.0
+
+# Set public_key to the verified public PEM, relative to this file. Pin its
+# fingerprint with west zkeyring fingerprint <public.pem> before signing.
+
+# prj.conf selects local and release.conf selects openbao. Use
+# -DZKEYRING_PROFILE=<name> to select a different profile for a build.
+profiles:
+  default:
+    backend: "local-keyring"
+    service: "zkeyring"
+    key: "firmware-dev"
+    public_key: keys/dev-public.pem
+    fingerprint: "69ac2f8f0bc05a03ebe2857e08eef3204fb0b53757025a7ef3fbfe2d3820ba22"
+
+  local:
+    backend: "local-keyring"
+    service: "zkeyring"
+    key: "firmware-dev"
+    public_key: keys/dev-public.pem
+    fingerprint: "69ac2f8f0bc05a03ebe2857e08eef3204fb0b53757025a7ef3fbfe2d3820ba22"
+
+  sops:
+    backend: "sops"
+    keyring: "keys/dev.sops"
+    # public_key: keys/dev-public.pem
+    # fingerprint: "<CI public key fingerprint>"
+
+  env:
+    backend: "environment"
+    variable: "FIRMWARE_SIGNING_KEY"
+    encoding: "base64"
+    # public_key: "keys/ci-public.pem"
+    # fingerprint: "<CI public key fingerprint>"
+
+  kv:
+    backend: "vault-kv"
+    mount: "secret"
+    path: "firmware/dev"
+    field: "pem"
+    version: 1
+    # public_key: "keys/kv-public.pem"
+    # fingerprint: "<Vault KV public key fingerprint>"
+
+  vault:
+    backend: "vault-transit"
+    mount: "transit"
+    key: "firmware-demo"
+    version: 1
+    # public_key: "keys/vault-public.pem"
+    # fingerprint: "<Vault Transit public key fingerprint>"
+
+  openbao:
+    backend: "openbao"
+    mount: "transit"
+    key: "firmware-demo"
+    version: 1
+    # public_key: "keys/openbao-public.pem"
+    # fingerprint: "<OpenBao Transit public key fingerprint>"
+
+  infisical:
+    backend: "infisical"
+    url: "https://app.infisical.com"
+    key: "<Infisical key ID>"
+    version: 1
+    # public_key: "keys/infisical-public.pem"
+    # fingerprint: "<Infisical public key fingerprint>"
+
+  gitlab:
+    backend: "gitlab-secrets"
+    variable: "FIRMWARE_PEM_FILE"
+    # public_key: "keys/gitlab-public.pem"
+    # fingerprint: "<GitLab public key fingerprint>"
+
+  hsm:
+    backend: "pkcs11"
+    module: "/path/to/pkcs11.so"
+    token: "firmware-hsm"
+    key: "01"
+    pin_variable: "FIRMWARE_HSM_PIN"
+    # public_key: "keys/hsm-public.pem"
+    # fingerprint: "<HSM public key fingerprint>"
