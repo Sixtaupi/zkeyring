@@ -1,0 +1,25 @@
+# SPDX-License-Identifier: Apache-2.0
+
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "zkeyring"
+version = "0.1.0"
+description = "External firmware signing for Zephyr and MCUboot"
+requires-python = ">=3.12"
+dynamic = ["dependencies"]
+
+[project.optional-dependencies]
+pkcs11 = ["python-pkcs11>=0.9"]
+
+[project.scripts]
+zkeyring = "zkeyring.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "scripts/signing"}
+packages = ["zkeyring"]
+
+[tool.setuptools.dynamic]
+dependencies = { file = ["scripts/requirements.txt"] }

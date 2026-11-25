@@ -1,0 +1,4 @@
+cryptography>=40
+keyring>=25
+requests>=2.32
+west>=1.2

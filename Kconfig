@@ -1,0 +1,37 @@
+# Copyright (c) 2021 Nordic Semiconductor ASA
+# SPDX-License-Identifier: Apache-2.0
+#
+# This Kconfig file is picked by the Zephyr build system because it is defined
+# as the module Kconfig entry point (see zephyr/module.yml). You can browse
+# module options by going to Zephyr -> Modules in Kconfig.
+
+config ZSIGNING
+	bool "Sign MCUboot firmware with zkeyring"
+	depends on BOOTLOADER_MCUBOOT
+	help
+	  Export the MCUboot image parameters and public key, then run
+	  zkeyring sign as part of the build.
+
+config ZSIGNING_DEFERRED
+	bool "Defer zkeyring signing to a separate step"
+	depends on ZSIGNING
+	help
+	  Export the unsigned image and signing metadata for a separate
+	  west zkeyring sign invocation in an environment with backend access.
+
+config ZSIGNING_PROFILE_FILE
+	string "zkeyring signing profile file"
+	depends on ZSIGNING
+	default "zkeyring.toml"
+	help
+	  Path to the TOML file used for signing during the build. Relative
+	  paths are resolved against the application source directory.
+	  The ZKEYRING_CONFIG CMake variable can override this path.
+
+config ZSIGNING_PROFILE
+	string "zkeyring signing profile"
+	depends on ZSIGNING
+	default "default"
+	help
+	  Name of the profile used for signing during the build. The
+	  ZKEYRING_PROFILE CMake variable can override this name.

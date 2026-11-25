@@ -1,0 +1,76 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+
+.wy-nav-content {
+    max-width: 900px;
+}
+
+/* The theme disables line wrapping in table cells. */
+.wy-table-responsive table td,
+.wy-table-responsive table th {
+    white-space: normal;
+}
+
+.rst-content figure {
+    margin: 1.5rem 0;
+}
+
+.rst-content figure img {
+    border-radius: 8px;
+}
+
+.rst-content figure.ui img {
+    border: 1px solid #d5dae0;
+}
+
+.zk-diagram {
+    margin: 1.5rem 0;
+    overflow-x: auto;
+}
+
+.zk-diagram svg {
+    display: block;
+    width: 100%;
+    min-width: 620px;
+    height: auto;
+}
+
+.zk-diagram text {
+    fill: #404040;
+    font-size: 14px;
+}
+
+.zk-diagram .small {
+    fill: #5f6368;
+    font-size: 12px;
+}
+
+.zk-diagram .mono {
+    font-family: SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12px;
+}
+
+.zk-diagram .title {
+    font-weight: 700;
+}
+
+.zk-diagram .box {
+    fill: #f3f6f6;
+    stroke: #c9d1d6;
+    stroke-width: 1.5;
+}
+
+.zk-diagram .key {
+    fill: #e7f2fa;
+    stroke: #2980b9;
+    stroke-width: 2;
+}
+
+.zk-diagram .line {
+    fill: none;
+    stroke: #6b7780;
+    stroke-width: 1.5;
+}
+
+.zk-diagram .head {
+    fill: #6b7780;
+}
