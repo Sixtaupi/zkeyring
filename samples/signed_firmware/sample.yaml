@@ -1,0 +1,24 @@
+# SPDX-License-Identifier: Apache-2.0
+
+sample:
+  name: Signed firmware
+  description: MCUboot firmware signed with zkeyring
+common:
+  sysbuild: true
+  tags:
+    - mcuboot
+    - signing
+tests:
+  # Signing is deferred, so this build needs no signing backend.
+  sample.zkeyring.signed_firmware.deferred:
+    build_only: true
+    extra_args:
+      - signed_firmware_CONFIG_ZSIGNING_DEFERRED=y
+    platform_allow:
+      - qemu_cortex_m0
+      - nrf52840dk/nrf52840
+      - nucleo_g0b1re
+    integration_platforms:
+      - qemu_cortex_m0
+      - nrf52840dk/nrf52840
+      - nucleo_g0b1re

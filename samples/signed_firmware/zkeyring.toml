@@ -1,0 +1,70 @@
+# SPDX-License-Identifier: Apache-2.0
+
+# Configure the selected backend, verify its public PEM, and pin its
+# fingerprint before signing. Use west zkeyring fingerprint <public.pem>.
+
+# Used unless CONFIG_ZSIGNING_PROFILE or ZKEYRING_PROFILE selects another profile.
+[profiles.default]
+backend = "local-keyring"
+service = "zkeyring"
+key = "firmware-dev"
+fingerprint = "69ac2f8f0bc05a03ebe2857e08eef3204fb0b53757025a7ef3fbfe2d3820ba22"
+
+[profiles.local]
+backend = "local-keyring"
+service = "zkeyring"
+key = "firmware-dev"
+fingerprint = "69ac2f8f0bc05a03ebe2857e08eef3204fb0b53757025a7ef3fbfe2d3820ba22"
+
+[profiles.dev]
+backend = "sops"
+keyring = "keys/dev.sops"
+fingerprint = "69ac2f8f0bc05a03ebe2857e08eef3204fb0b53757025a7ef3fbfe2d3820ba22"
+
+[profiles.ci]
+backend = "environment"
+variable = "FIRMWARE_SIGNING_KEY"
+encoding = "base64"
+# fingerprint = "<CI public key fingerprint>"
+
+[profiles.kv]
+backend = "vault-kv"
+mount = "secret"
+path = "firmware/dev"
+field = "pem"
+version = 1
+# fingerprint = "<Vault KV public key fingerprint>"
+
+[profiles.vault]
+backend = "vault-transit"
+mount = "transit"
+key = "firmware-demo"
+version = 1
+# fingerprint = "<Vault Transit public key fingerprint>"
+
+[profiles.openbao]
+backend = "openbao"
+mount = "transit"
+key = "firmware-demo"
+version = 1
+# fingerprint = "<OpenBao public key fingerprint>"
+
+[profiles.infisical]
+backend = "infisical"
+url = "https://app.infisical.com"
+key = "<Infisical key ID>"
+version = 1
+# fingerprint = "<Infisical public key fingerprint>"
+
+[profiles.gitlab]
+backend = "gitlab-secrets"
+variable = "FIRMWARE_PEM_FILE"
+# fingerprint = "<GitLab public key fingerprint>"
+
+[profiles.hsm]
+backend = "pkcs11"
+module = "/path/to/pkcs11.so"
+token = "firmware-hsm"
+key = "01"
+pin_variable = "FIRMWARE_HSM_PIN"
+# fingerprint = "<HSM public key fingerprint>"

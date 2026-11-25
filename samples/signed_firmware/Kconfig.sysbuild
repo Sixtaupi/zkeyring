@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: Apache-2.0
+
+# This default takes precedence over MCUboot's private development key.
+config BOOT_SIGNATURE_KEY_FILE
+	string
+	default "$(APP_DIR)/keys/dev-public.pem" if BOOT_SIGNATURE_TYPE_ECDSA_P256
+
+source "share/sysbuild/Kconfig"

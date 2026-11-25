@@ -1,0 +1,42 @@
+<div class="zk-diagram">
+<svg viewBox="0 0 800 400" role="img" aria-labelledby="flow-title flow-desc" xmlns="http://www.w3.org/2000/svg">
+<title id="flow-title">Signing flow</title>
+<desc id="flow-desc">The Zephyr build produces an unsigned image, signing parameters and a public key. zkeyring sends a 32-byte digest to the backend, receives a signature, verifies it and writes the signed image that MCUboot accepts.</desc>
+<defs><marker id="flow-a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="8" markerHeight="8" orient="auto"><path class="head" d="M0 0L8 4L0 8z"/></marker></defs>
+<rect class="box" x="10" y="40" width="200" height="190" rx="8"/>
+<text class="title" x="26" y="66">Zephyr build</text>
+<text class="small" x="26" y="88">No private key needed</text>
+<text class="mono" x="26" y="124">zephyr.bin</text>
+<text class="mono" x="26" y="152">zkeyring-sign.json</text>
+<text class="mono" x="26" y="180">zkeyring-public.pem</text>
+<path class="line" d="M210 135H288" marker-end="url(#flow-a)"/>
+<rect class="box" x="290" y="10" width="220" height="250" rx="8"/>
+<text class="title" x="306" y="36">west zkeyring sign</text>
+<text x="306" y="70">1. Check both fingerprints</text>
+<text x="306" y="100">2. Compute the digest</text>
+<text x="306" y="130">3. Request the signature</text>
+<text x="306" y="160">4. Verify the signature</text>
+<text x="306" y="190">5. Embed it in the image</text>
+<text x="306" y="220">6. Verify the whole image</text>
+<text class="small" x="306" y="246">Any failure stops before output</text>
+<rect class="box key" x="610" y="40" width="180" height="190" rx="8"/>
+<text class="title" x="626" y="66">Backend</text>
+<text class="small" x="626" y="88">Holds the private key</text>
+<text x="626" y="124">OS keyring, SOPS,</text>
+<text x="626" y="146">CI secret, Vault,</text>
+<text x="626" y="168">OpenBao, Infisical,</text>
+<text x="626" y="190">HSM</text>
+<path class="line" d="M510 115H608" marker-end="url(#flow-a)"/>
+<text class="small" x="526" y="106">digest</text>
+<path class="line" d="M610 160H512" marker-end="url(#flow-a)"/>
+<text class="small" x="526" y="180">signature</text>
+<path class="line" d="M400 260V308" marker-end="url(#flow-a)"/>
+<rect class="box" x="290" y="310" width="220" height="70" rx="8"/>
+<text class="mono" x="306" y="340">zephyr.signed.bin</text>
+<text class="small" x="306" y="362">Replaced atomically</text>
+<path class="line" d="M510 345H608" marker-end="url(#flow-a)"/>
+<rect class="box" x="610" y="310" width="180" height="70" rx="8"/>
+<text class="title" x="626" y="340">MCUboot</text>
+<text class="small" x="626" y="362">Embeds the public key</text>
+</svg>
+</div>
